@@ -149,15 +149,18 @@ class plantBoxTab(Frame):
             if self._pb.tnhIsOpen:
                 try:
                     self.settings.set(item='温度',column=1, value=str(self._pb.temperture))
+                    self.settings.set(item='温度',column=3, value=self._pb.status)
                     self.settings.set(item='湿度',column=1, value=str(self._pb.humidity))
+                    self.settings.set(item='湿度',column=3, value=self._pb.status)
                 except:
-                    self.settings.insert('','end',iid='温度',values=['温度', '0.0','None','正在查询'])
-                    self.settings.insert('','end',iid='湿度', values=['湿度', '0.0','None','正在查询'])
+                    self.settings.insert('','end',iid='温度',values=['温度', '0.0','None',plantbox.Status.QUERYING.value])
+                    self.settings.insert('','end',iid='湿度', values=['湿度', '0.0','None',plantbox.Status.QUERYING.value])
             if self._pb.distanceIsOpen:
                 try:
                     self.settings.set(item='液位',column=1, value=str(self._pb.distance))
+                    self.settings.set(item='液位',column=3, value=self._pb.distanceStatus)
                 except:
-                    self.settings.insert('','end',iid='液位',values=['液位', '0.0','None','正在查询'])
+                    self.settings.insert('','end',iid='液位',values=['液位', '0.0','None',plantbox.Status.QUERYING.value])
                 
 class SettingEntry(Entry):
     '''

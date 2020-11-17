@@ -2,6 +2,7 @@
 import serial
 import time
 import threading
+import enum
 #temperture and humidity
 #tNh = serial.Serial('COM5',9600,timeout = 1)
 '''
@@ -11,6 +12,12 @@ for i in range(30):
     tNh.write(b'1')
     print(s)
 '''
+class Status(enum.Enum):
+    QUERYING = "查询中"
+    PROCESSING = "调整中"
+    NORMAL = "正常"
+    TIMEOUT = "TIMEOUT"
+
 class plantbox(object):
     def __init__(self, tnhPortNumber:str = None, distancePortNumber:str = None):
         self.lock = threading.Lock()
@@ -20,7 +27,8 @@ class plantbox(object):
         self._lux = 0.0
         self._tnhPort = None
         self._distancePort = None
-        self._status = '正常'
+        self._status = Status.NORMAL
+        self._distance_status = Status.NORMAL
         if tnhPortNumber:
             self.openTnhPort(tnhPortNumber)
         if distancePortNumber:
@@ -69,17 +77,26 @@ class plantbox(object):
                     self._temperture = float(s[1])
                 
                 self.lock.release()
-                if self._settingTemp > 0 and self._settingTemp < self._temperture:
-                    s = '1'                    
-                else:
+                print(self.status)
+                if self._settingTemp > 0 and self._settingTemp < self._temperture and self._status == Status.NORMAL:
+                    s = '1'    
+                    self._tnhPort.write(s.encode('utf-8'))
+                    self._status = Status.PROCESSING               
+                elif (self._settingTemp <= 0 or self._settingTemp >= self._temperture) and self._status == Status.PROCESSING:
                     s = '0'
-                self._tnhPort.write(s.encode('utf-8'))
+                    self._status = Status.NORMAL
+                    self._tnhPort.write(s.encode('utf-8'))
+                
 
                 #print(self._humidity)
                 #print(self._temperture)
+    @property
     def status(self):
-        
-        pass
+        return self._status.value
+    @property
+    def distanceStatus(self):
+        return self._distance_status.value
+
     def distanceQuery(self):        
         while True:
             time.sleep(0.5)
@@ -95,6 +112,7 @@ class plantbox(object):
                     self.lock.acquire()
                     if len(s)>1:
                         self._distance = int(s[1])
+                    self._distance_status=Status.NORMAL
                     self.lock.release()
                 except :
                     pass
