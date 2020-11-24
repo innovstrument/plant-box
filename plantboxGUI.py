@@ -29,24 +29,30 @@ class Application(Application_ui):
         Application_ui.__init__(self, master)
 
     def newTab(self):
-        self.count = 1
+        self.count = 0
         self.TabStrip1__Tab1 = Frame(self.notebook)
         #s = plantBoxTab(self.notebook)
         #self.notebook.add(s, text='Plant Box '+ str(self.count))
-        self.addbutton = Button(self.notebook, width = 2, text = '+', command = self.addTab)
+        #self.addbutton = Button(self.notebook, width = 2, text = '+', command = self.addTab)
+        
+        #print(self.notebook.tabs)      
+        
         self.addTab()
+        emptyFrame = Frame()
+        self.notebook.add(emptyFrame, text='+')
+        print()
+        self.notebook.bind("<<NotebookTabChanged>>", self.addTabButton)
         
-        
-        
+    def addTabButton(self,ev):
+        if self.notebook.select() == '.!frame':
+            self.addTab()        
 
     def addTab(self):
         s = plantBoxTab(self.notebook)
-        
         self.notebook.add(s, text='Plant Box '+ str(self.count))
-        #print(self.notebook.)
-        self.addbutton.place(x = 67.5*self.count, y = 0.00 )
+        self.notebook.insert(self.count,s)
+        self.notebook.select(self.count)
         self.count +=1
-        pass
 
 class plantBoxTab(Frame):
     lables = ['参数名', '当前读数','预设定值', '调节状态']
