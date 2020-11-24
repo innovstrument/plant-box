@@ -30,17 +30,10 @@ class Application(Application_ui):
 
     def newTab(self):
         self.count = 0
-        self.TabStrip1__Tab1 = Frame(self.notebook)
-        #s = plantBoxTab(self.notebook)
-        #self.notebook.add(s, text='Plant Box '+ str(self.count))
-        #self.addbutton = Button(self.notebook, width = 2, text = '+', command = self.addTab)
-        
-        #print(self.notebook.tabs)      
-        
+        self.TabStrip1__Tab1 = Frame(self.notebook)        
         self.addTab()
         emptyFrame = Frame()
         self.notebook.add(emptyFrame, text='+')
-        print()
         self.notebook.bind("<<NotebookTabChanged>>", self.addTabButton)
         
     def addTabButton(self,ev):
